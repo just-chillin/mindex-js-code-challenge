@@ -1,7 +1,7 @@
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {from, Observable, throwError} from 'rxjs';
-import {catchError, flatMap} from 'rxjs/operators';
+import {catchError, flatMap, mapTo} from 'rxjs/operators';
 
 import {Employee} from './employee';
 
@@ -9,20 +9,31 @@ import {Employee} from './employee';
 export class EmployeeService {
   private url = '/api/employees';
 
+  private cache = new Map<number, Employee>();
+
   constructor(private http: HttpClient) {
   }
 
   getAll(): Observable<Employee> {
     return this.http.get<Employee[]>(this.url)
       .pipe(
-        flatMap(emps => from(emps)),
+        flatMap(emps => {
+          emps.forEach(emp => this.cache.set(emp.id, emp));
+          return from(emps);
+        }),
         catchError(this.handleError)
       );
   }
 
-  get(id: number): Observable<Employee> {
-    return this.http.get<Employee>(`${this.url}/${id}`)
+  get(id: number): Observable<Employee> | Employee {
+    if (this.cache.has(id)) {
+      return this.cache.get(id);
+    }
+    const result = this.http.get<Employee>(`${this.url}/${id}`)
       .pipe(catchError(this.handleError));
+    result.toPromise().then(emp => this.cache.set(id, emp));
+
+    return result;
   }
 
   save(emp: Employee): Observable<Employee> {

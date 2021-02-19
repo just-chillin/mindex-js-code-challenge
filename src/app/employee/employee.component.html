@@ -1,12 +1,29 @@
 <mat-card class="employee">
   <mat-card-header>
     <mat-card-title>{{employee.lastName}}, {{employee.firstName}}</mat-card-title>
-    <mat-card-subtitle>{{employee.id}}</mat-card-subtitle>
+    <mat-card-subtitle>Employee ID: {{employee.id}} Total Reports: {{totalReports}}</mat-card-subtitle>
+
   </mat-card-header>
   <mat-card-content>
     <dl>
       <dt>Job Title</dt>
       <dd>{{employee.position}}</dd>
     </dl>
+
   </mat-card-content>
+  <div *ngIf="directReports.length">
+    <mat-list>
+      <h3 mat-subheader>Reports</h3>
+      <mat-list-item *ngFor="let emp of directReports; last as last">
+        <h4 mat-line>{{emp.firstName}} {{emp.lastName}}</h4>
+        <a (click)="onEditClicked(emp)" aria-label="edit">
+          <mat-icon aria-hidden="false" aria-label="Example home icon">edit</mat-icon>
+        </a>
+        <a (click)="onDeleteClicked(emp)" aria-label="delete">
+          <mat-icon aria-hidden="false" aria-label="Example home icon">delete</mat-icon>
+        </a>
+        <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
+      </mat-list-item>
+    </mat-list>
+  </div>
 </mat-card>
