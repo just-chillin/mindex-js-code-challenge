@@ -1,1 +1,31 @@
-<p>edit-modal works!</p>
+<h1 mat-dialog-title>Update Compensation</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <mat-label>First Name</mat-label>
+    <label>
+      <input matInput disabled [(ngModel)]="emp.firstName">
+    </label>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Last Name</mat-label>
+    <label>
+      <input matInput disabled [(ngModel)]="emp.lastName">
+    </label>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Position</mat-label>
+    <label>
+      <input matInput disabled [(ngModel)]="emp.position">
+    </label>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Compensation</mat-label>
+    <label>
+      <input matInput matPrefix="$" type="number" [(ngModel)]="emp.compensation">
+    </label>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="null">Cancel</button>
+  <button mat-button [mat-dialog-close]="emp">Ok</button>
+</div>

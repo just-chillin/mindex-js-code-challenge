@@ -1,1 +1,9 @@
-<p>delete-modal works!</p>
+<h1 mat-dialog-title>Delete Direct Report</h1>
+<mat-dialog-content>
+  <p mat-dialog-content>Permanently delete direct report Homer Thompson?</p>
+  <p mat-dialog-content>This action cannot be undone.</p>
+</mat-dialog-content>
+<div mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="false">Cancel</button>
+  <button mat-button [mat-dialog-close]="true">Ok</button>
+</div>

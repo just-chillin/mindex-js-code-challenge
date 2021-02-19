@@ -2,10 +2,10 @@ import {Component, Input, OnInit, Output} from '@angular/core';
 
 import {Employee} from '../employee';
 import {EmployeeService} from '../employee.service';
-import {Observable, of, pipe, Subscriber} from 'rxjs';
-import {fromArray} from 'rxjs/internal/observable/fromArray';
-import {concatAll, exhaust, expand, filter, map, mapTo, mergeScan, skip} from 'rxjs/operators';
-import {visit} from '@angular/compiler-cli/src/ngtsc/util/src/visitor';
+import {Observable} from 'rxjs';
+import {MatDialog} from '@angular/material/dialog';
+import {EditModalComponent} from '../edit-modal/edit-modal.component';
+import {DeleteModalComponent} from '../delete-modal/delete-modal.component';
 
 const employee_cache = new Map<number, Employee>();
 
@@ -19,30 +19,32 @@ export class EmployeeComponent implements OnInit {
   directReports: Employee[] = [];
   totalReports = 0;
 
-  constructor(private employeeService: EmployeeService) {
+  constructor(private employeeService: EmployeeService, private dialog: MatDialog) {
   }
 
   onEditClicked(emp: Employee) {
-
+    const editDialogRef = this.dialog.open(EditModalComponent, {data: emp});
+    editDialogRef.afterClosed().toPromise().then(res => res ?? false ? this.employeeService.save(res) : {});
   }
 
   onDeleteClicked(emp: Employee) {
-
+    const deleteDialogRef = this.dialog.open(DeleteModalComponent, {data: emp});
+    deleteDialogRef.afterClosed().toPromise().then(confirm => confirm ? this.employeeService.remove(emp) : {});
   }
 
   private async initReports(): Promise<[Employee[], number]> {
     // BFS for employees who report to the employee owned by this component
-    const visited = new Set<number>();
     const directReports = [];
-    let totalReports = 0;
-    const todo = [];
-    for (const subordinate_id of this.employee.directReports) {
+    for (const subordinate_id of this.employee.directReports ?? []) {
       let child = this.employeeService.get(subordinate_id);
       if (child instanceof Observable) {
         child = await child.toPromise();
       }
       directReports.push(child);
     }
+    let totalReports = 0;
+    const visited = new Set<number>();
+    const todo = [];
     for (let node = this.employee; node !== undefined; node = todo.shift()) {
       visited.add(node.id);
       for (const child_id of (node.directReports ?? [])) {
@@ -58,7 +60,7 @@ export class EmployeeComponent implements OnInit {
       }
       totalReports++;
     }
-    return [directReports, totalReports];
+    return [directReports, totalReports - 1];
   }
 
   ngOnInit(): void {

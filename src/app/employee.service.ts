@@ -42,6 +42,7 @@ export class EmployeeService {
   }
 
   remove(emp: Employee): Observable<never> {
+    this.cache.delete(emp.id);
     return this.http
       .delete<never>(`${this.url}/${emp.id}`)
       .pipe(catchError(this.handleError));

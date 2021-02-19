@@ -1,15 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'app-delete-modal',
   templateUrl: './delete-modal.component.html',
   styleUrls: ['./delete-modal.component.css']
 })
-export class DeleteModalComponent implements OnInit {
+export class DeleteModalComponent {
 
-  constructor() { }
 
-  ngOnInit(): void {
+  onCancel() {
+
   }
-
 }

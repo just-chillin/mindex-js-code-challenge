@@ -19,6 +19,7 @@ import {MatDividerModule} from '@angular/material/divider';
 import {MatListModule} from '@angular/material/list';
 import { EditModalComponent } from './edit-modal/edit-modal.component';
 import { DeleteModalComponent } from './delete-modal/delete-modal.component';
+import {MatDialogModule} from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { DeleteModalComponent } from './delete-modal/delete-modal.component';
     MatButtonModule,
     MatDividerModule,
     MatListModule,
+    MatDialogModule,
   ],
   providers: [EmployeeService, MatIconRegistry],
   bootstrap: [AppComponent]
