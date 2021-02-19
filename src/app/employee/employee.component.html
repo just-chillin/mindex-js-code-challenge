@@ -5,7 +5,7 @@
 
   </mat-card-header>
 
-  <mat-card-content *ngIf="directReports.length">
+  <mat-card-content *ngIf="directReports.size">
     <mat-list>
       <h3 mat-subheader>Reports</h3>
       <mat-list-item *ngFor="let emp of directReports; last as last">

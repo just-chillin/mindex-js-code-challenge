@@ -16,10 +16,11 @@ const employee_cache = new Map<number, Employee>();
 })
 export class EmployeeComponent implements OnInit {
   @Input() employee: Employee;
-  directReports: Employee[] = [];
+  directReports: Set<Employee> = new Set();
   totalReports = 0;
 
   constructor(private employeeService: EmployeeService, private dialog: MatDialog) {
+
   }
 
   onEditClicked(emp: Employee) {
@@ -32,7 +33,7 @@ export class EmployeeComponent implements OnInit {
     deleteDialogRef.afterClosed().toPromise().then(confirm => confirm ? this.employeeService.remove(emp) : {});
   }
 
-  private async initReports(): Promise<[Employee[], number]> {
+  private async initReports(): Promise<[Set<Employee>, number]> {
     // BFS for employees who report to the employee owned by this component
     const directReports = [];
     for (const subordinate_id of this.employee.directReports ?? []) {
@@ -60,10 +61,22 @@ export class EmployeeComponent implements OnInit {
       }
       totalReports++;
     }
-    return [directReports, totalReports - 1];
+    return [new Set(directReports), totalReports - 1];
   }
 
   ngOnInit(): void {
+    this.employeeService.empEditEvent.subscribe({
+      next: (v) => {
+        if (v.evt === 'delete') {
+          this.directReports.delete(v.emp);
+          if (this.totalReports > 0) {
+            this.totalReports--;
+          }
+        } else if (this.directReports.has(v.emp)) {
+          this.directReports.add(v.emp);
+        }
+      }
+    });
     this.initReports().then(result => ([this.directReports, this.totalReports] = result));
   }
 }

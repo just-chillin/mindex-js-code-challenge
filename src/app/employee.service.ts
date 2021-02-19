@@ -1,15 +1,23 @@
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {from, Observable, throwError} from 'rxjs';
+import {from, Observable, Subject, throwError} from 'rxjs';
 import {catchError, flatMap, mapTo} from 'rxjs/operators';
 
 import {Employee} from './employee';
+
+interface EditOrDeleteEvent {
+  evt: 'edit' | 'delete';
+  emp: Employee;
+}
 
 @Injectable()
 export class EmployeeService {
   private url = '/api/employees';
 
   private cache = new Map<number, Employee>();
+
+  // Either 'delete' or edit
+  public empEditEvent = new Subject<EditOrDeleteEvent>();
 
   constructor(private http: HttpClient) {
   }
@@ -37,12 +45,15 @@ export class EmployeeService {
   }
 
   save(emp: Employee): Observable<Employee> {
+    this.cache.set(emp.id, emp);
+    this.empEditEvent.next({evt: 'edit', emp});
     const response = (!!emp.id) ? this.put(emp) : this.post(emp);
     return response.pipe(catchError(this.handleError));
   }
 
   remove(emp: Employee): Observable<never> {
     this.cache.delete(emp.id);
+    this.empEditEvent.next({evt: 'delete', emp});
     return this.http
       .delete<never>(`${this.url}/${emp.id}`)
       .pipe(catchError(this.handleError));
